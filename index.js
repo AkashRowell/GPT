@@ -95,7 +95,73 @@ app.post('/gpt', async (req, res) => {
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_URL = "https://tnrrtqoukdsygsighuqo.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRucnJ0cW91a2RzeWdzaWdodXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk4NzIyNDgsImV4cCI6MjA1NTQ0ODI0OH0.pNG4mpcz2ZnwU-Sll37SPJQ59NiRthDUB_WxC6kYkuc";
+
+export const supabase = createClient(https://tnrrtqoukdsygsighuqo.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRucnJ0cW91a2RzeWdzaWdodXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk4NzIyNDgsImV4cCI6MjA1NTQ0ODI0OH0.pNG4mpcz2ZnwU-Sll37SPJQ59NiRthDUB_WxC6kYkuc);
+
+
+async function signUp(email, password) {
+  const { user, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) {
+    console.error("Signup error:", error.message);
+  } else {
+    console.log("User signed up:", user);
+  }
+}
+
+
+async function signIn(email, password) {
+  const { user, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    console.error("Login error:", error.message);
+  } else {
+    console.log("User logged in:", user);
+  }
+}
+
+async function signOut() {
+  await supabase.auth.signOut();
+  console.log("User signed out");
+}
+
+async function saveMessage(userId, message) {
+  const { error } = await supabase
+    .from("chat_history")
+    .insert([{ user_id: userId, message }]);
+
+  if (error) {
+    console.error("Error saving message:", error.message);
+  }
+}
+
+async function getChatHistory(userId) {
+  const { data, error } = await supabase
+    .from("chat_history")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching chat history:", error.message);
+    return [];
+  }
+
+  return data;
+}
+
 
 app.listen(5000, () => {
     console.log('Example app listening on port 5000!');
 });
+
